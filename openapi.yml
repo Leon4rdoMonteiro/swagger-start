@@ -1,14 +1,77 @@
+# As a demonstration of an API spec in YML
 swagger: '2.0'
 info:
-  title: API Title
+  title: Swagger Title Example
+  description: Your API description here
+  contact:
+    name: Leonardo Monteiro
+    email: leonardomonteiro.sh@gmail.com
   version: '1.0'
+
 host: api.server.test
-basePath: /
+basePath: /v1
+produces:
+  - application/json
+
 schemes:
+  - http
   - https
+
 paths:
-  /test:
+  /users:
     get:
+      summary: This route will return all users in the database
+      description: This endpoint gets all registered users in the system.
+      tags:
+        - Users
       responses:
-        '200':
-          description: OK
+        200:
+          description: An array of users data
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        404:
+          description: Not found error
+          schema:
+            $ref: '#/definitions/NotFoundError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions: 
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: User identifier
+      name: 
+        type: string
+        description: User name
+      email:
+        type: string
+        description: User email
+      created_at:
+        type: string
+        description: User create date
+      updated_at:
+        type: string
+        description: User update date
+
+  NotFoundError:
+    type: object
+    properties:
+      message:
+        type: string 
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
