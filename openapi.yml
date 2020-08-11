@@ -1,17 +1,27 @@
 # As a demonstration of an API spec in YML
 swagger: '2.0'
 info:
-  title: Swagger Title Example
+  title: Swagger Doc Example
   description: Your API description here
   contact:
     name: Leonardo Monteiro
     email: leonardomonteiro.sh@gmail.com
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
   version: '1.0'
 
 host: api.server.test
 basePath: /v1
+tags:
+- name: Users
+  description: Everything about users
 produces:
   - application/json
+  - application/xml
+consumes:
+  - application/json
+  - application/xml
 
 schemes:
   - http
@@ -19,20 +29,166 @@ schemes:
 
 paths:
   /users:
-    get:
-      summary: This route will return all users in the database
-      description: This endpoint gets all registered users in the system.
+    post:
+      summary: This route will create a user
+      description: This endpoint will **create a user in the system.**
+      parameters:
+        - name: user
+          in: body
+          description: User
+          required: true
+          schema:
+            $ref: '#/definitions/User'
       tags:
         - Users
       responses:
-        200:
+        "201":
+          description: User registered successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ValidationError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: This route will return a list of users in the database
+      description: This endpoint gets **all registered users in the system.**
+      tags:
+        - Users
+      responses:
+        "200":
           description: An array of users data
           schema:
             type: array
             items:
               $ref: '#/definitions/User'
-        404:
-          description: Not found error
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/NotFoundError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}:
+    get:
+      summary: This route will return an unique user
+      description: This endpoint gets **an user by id and return it**
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: number
+      tags:
+        - Users
+      responses:
+        "200":
+          description: An object with user data
+          schema:
+            $ref: '#/definitions/User'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/NotFoundError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: This route will update a user
+      description: This endpoint will **update a user in the system by id.**
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: number
+        - name: user
+          in: body
+          description: User
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - Users
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ValidationError'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/NotFoundError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: This route will update partialty a user
+      description: This endpoint will **update partialty a user in the system by id.**
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: number
+        - name: user
+          in: body
+          description: User
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - Users
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        "400":
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ValidationError'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/NotFoundError'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: This route will delete a user
+      description: This endpoint will **delete a user in the system by id.**
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: number
+      tags:
+        - Users
+      responses:
+        "204":
+          description: No content
+        "404":
+          description: User not found
           schema:
             $ref: '#/definitions/NotFoundError'
         default:
@@ -42,6 +198,9 @@ paths:
 definitions: 
   User:
     type: object
+    required:
+      - email
+      - name
     properties:
       id:
         type: integer
@@ -63,6 +222,16 @@ definitions:
     type: object
     properties:
       message:
+        type: string 
+  
+  ValidationError:
+    type: object
+    properties:
+      message:
+        type: string
+      field: 
+        type: string
+      value: 
         type: string 
 
   Error:
